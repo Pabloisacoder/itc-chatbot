@@ -1,0 +1,73 @@
+{
+  "users": [
+    {
+      "username": "distributor1",
+      "passwordHash": "$2a$10$3b5H5zU5YwI9j9JkJ7o9rO4oYv8h6h7Xy6tG5VnTr4m1sx3oC1ti6",
+      "role": "Employee"
+    },
+    {
+      "username": "piyush",
+      "passwordHash": "$2b$10$fgOInMRbiJuhA8C7aeKzZurxOpOm1LigcynNWZy23q2MUpclPYy6O",
+      "role": "Employee",
+      "status": "rejected",
+      "registeredAt": "2025-12-21T19:18:29.802Z"
+    },
+    {
+      "username": "AMARTYA",
+      "passwordHash": "$2b$10$ATEoEzhdwuHHQs468ziXYOvlTWvWvOQfnTrI3tlOM.W.cADzTdTQO",
+      "role": "Admin",
+      "status": "approved",
+      "registeredAt": "2025-12-29T07:03:15.764Z"
+    },
+    {
+      "username": "RAMLAL",
+      "passwordHash": "$2b$10$rCKJnBSbcvNmTDSQ7JtMUumfNG2gt5tehnH3Ig277IyEVbSiyhbMy",
+      "role": "Employee",
+      "status": "approved",
+      "registeredAt": "2025-12-29T07:19:55.987Z"
+    },
+    {
+      "username": "deep",
+      "passwordHash": "$2b$10$U2vki.Q2YLrN1iQ9CLtMRe541RIdKysUzJnlslPu8/FihyjvaWbjG",
+      "role": "Employee",
+      "status": "rejected",
+      "registeredAt": "2026-01-02T16:19:06.301Z"
+    },
+    {
+      "username": "ishu",
+      "passwordHash": "$2b$10$dMS9BZ7lHd2aJa58N0y.eOJqvFECTeSCKGGGumW37f8gypYyhlHBy",
+      "role": "Employee",
+      "status": "rejected",
+      "registeredAt": "2026-01-02T16:29:15.153Z"
+    },
+    {
+      "username": "ram",
+      "passwordHash": "$2b$10$dsiP3y/ypF/BgDO.cr5wq.4CRJYNL2pymgGP9xOGnKWMxQamUesoy",
+      "role": "Employee",
+      "status": "approved",
+      "registeredAt": "2026-01-02T16:50:25.112Z"
+    },
+    {
+      "username": "ash",
+      "passwordHash": "$2b$10$ONy2/xWULgTzQJV.Mwikou9vTRFA2mMnorAb9S7Wkd/uQ45i9JoGu",
+      "role": "Employee",
+      "status": "rejected",
+      "registeredAt": "2026-01-02T17:16:59.182Z"
+    },
+    {
+      "username": "nishu",
+      "passwordHash": "$2b$10$/9jLjUCKQdz4HuhT/1iDfuVFbwdlP38uw8mBE6T9i9JVbCgwar3Ni",
+      "role": "Contractor",
+      "status": "approved",
+      "registeredAt": "2026-01-02T17:57:14.756Z"
+    },
+    {
+      "username": "ravi",
+      "passwordHash": "$2b$10$uGReCJjRkBUVzZhz28mZbufiQ62fNI0E9QwO15Sx9M9EcISglHxlq",
+      "role": "SSP",
+      "contractor": "nishu",
+      "status": "approved",
+      "registeredAt": "2026-01-02T17:58:01.587Z"
+    }
+  ]
+}

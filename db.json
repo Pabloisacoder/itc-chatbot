@@ -1,0 +1,43 @@
+{
+  "tickets": [
+    {
+      "id": "G00001",
+      "empId": "777777",
+      "email": "N/A",
+      "category": "Worker Grievance",
+      "desc": "[Name: ravi, Role: SSP, Contractor: nishu] maara hai",
+      "status": "In Progress",
+      "createdBy": {
+        "username": "ravi",
+        "role": "SSP"
+      },
+      "createdAt": "2026-01-02T17:59:07.967Z"
+    },
+    {
+      "id": "T00002",
+      "empId": "777777",
+      "email": "N/A",
+      "category": "Payslip",
+      "desc": "can not download it",
+      "status": "Open",
+      "createdBy": {
+        "username": "ravi",
+        "role": "SSP"
+      },
+      "createdAt": "2026-01-02T18:32:25.882Z"
+    },
+    {
+      "id": "T00003",
+      "empId": "777777",
+      "email": "N/A",
+      "category": "Other",
+      "desc": "Humko Mara Hai Sar niswa",
+      "status": "Open",
+      "createdBy": {
+        "username": "ravi",
+        "role": "SSP"
+      },
+      "createdAt": "2026-01-02T18:32:48.201Z"
+    }
+  ]
+}
