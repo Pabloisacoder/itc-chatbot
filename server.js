@@ -292,7 +292,12 @@ app.get('/api/bot/intro', (req, res) => {
 
 // Handle React/Vite routing, return all requests to React app
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send('Error: public/index.html not found. Please build the frontend and copy it to server/public.');
+  }
 });
 
 app.listen(PORT, () => {
