@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ITC Helpdesk Chatbot</title>
+  <style>
+    :root {
+      --primary-color: #005f9e;
+      --secondary-color: #00a8e8;
+      --background-color: #f8f9fa;
+      --surface-color: #ffffff;
+      --text-color: #212529;
+      --border-color: #dee2e6;
+      --success-color: #28a745;
+      --error-color: #dc3545;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    body { font-family: var(--font-family); margin: 0; background-color: var(--background-color); color: var(--text-color); }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background-color: var(--surface-color); border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    header h1 { color: var(--primary-color); margin: 0; font-size: 1.5rem; }
+    main { padding: 2rem; }
+    dialog { border: none; border-radius: 8px; padding: 2rem; min-width: 350px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+    dialog h2 { margin-top: 0; color: var(--primary-color); }
+    form { display: flex; flex-direction: column; gap: 10px; }
+    form input, form select, form textarea { padding: 12px; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 4px; transition: border-color 0.2s; }
+    form input:focus, form select:focus, form textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(0, 95, 158, 0.2); }
+    button { padding: 12px 20px; font-size: 1rem; border-radius: 4px; border: none; cursor: pointer; transition: background-color 0.2s, transform 0.1s; font-weight: 600; position: relative; }
+    button[type="submit"] { background-color: var(--primary-color); color: white; }
+    button[type="submit"]:hover { background-color: #004c7d; }
+    button:active { transform: scale(0.98); }
+    button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
+    .auth-buttons button, #logoutButton { margin-left: 10px; background: none; border: 1px solid var(--primary-color); color: var(--primary-color); }
+    .auth-buttons button:hover, #logoutButton:hover { background-color: var(--primary-color); color: white; }
+    #logoutButton { border-color: var(--error-color); color: var(--error-color); }
+    #logoutButton:hover { background-color: var(--error-color); color: white; }
+    #registerForm { display: none; } /* Hide by default */
+    .chat-container { max-width: 600px; margin: 20px auto; border: 1px solid var(--border-color); background: var(--surface-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; }
+    #chat-window { height: 500px; overflow-y: auto; padding: 20px; }
+    #message-list { list-style-type: none; padding: 0; margin: 0; }
+    .chat-message { padding: 10px 16px; margin-bottom: 10px; border-radius: 20px; max-width: 80%; line-height: 1.5; }
+    .chat-message.user { background-color: var(--primary-color); color: white; margin-left: auto; border-bottom-right-radius: 5px; }
+    .chat-message.bot { background-color: #e9ecef; color: var(--text-color); margin-right: auto; border-bottom-left-radius: 5px; }
+    .chat-input { display: flex; padding: 10px; border-top: 1px solid var(--border-color); }
+    #message-input { flex-grow: 1; border: none; border-radius: 4px; padding: 12px; font-size: 1rem; background: #f1f1f1; }
+    #message-input:focus { outline: none; }
+    #send-button { margin-left: 10px; background-color: var(--secondary-color); color: white; }
+    #send-button:hover { background-color: #0095cc; }
+    /* Google Mic Style */
+    #mic-button { margin-left: 10px; background-color: white; color: #5f6368; border: 1px solid #dadce0; border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s; flex-shrink: 0; }
+    #mic-button:hover { background-color: #f8f9fa; box-shadow: 0 1px 3px rgba(0,0,0,0.2); color: #3c4043; }
+    #mic-button.listening { background-color: white; border-color: #ea4335; box-shadow: 0 2px 6px rgba(234, 67, 53, 0.3); }
+    /* Google Dots Animation */
+    .google-dots { display: flex; gap: 3px; align-items: center; height: 100%; }
+    .google-dots span { width: 4px; height: 4px; border-radius: 50%; animation: google-wave 1s infinite ease-in-out; }
+    .google-dots span:nth-child(1) { background: #4285f4; animation-delay: 0s; }
+    .google-dots span:nth-child(2) { background: #ea4335; animation-delay: 0.1s; }
+    .google-dots span:nth-child(3) { background: #fbbc05; animation-delay: 0.2s; }
+    .google-dots span:nth-child(4) { background: #34a853; animation-delay: 0.3s; }
+    @keyframes google-wave { 0%, 100% { transform: translateY(0); height: 4px; } 50% { transform: translateY(-3px); height: 10px; } }
+    .chat-options { list-style-type: none; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 10px 40px; }
+    .chat-options button { background: var(--surface-color); border: 1px solid var(--secondary-color); color: var(--secondary-color); border-radius: 20px; padding: 6px 12px; cursor: pointer; font-weight: 500; }
+    .chat-options button:hover { background: var(--secondary-color); color: white; }
+    /* Spinner */
+    .spinner { display: none; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #fff; width: 18px; height: 18px; animation: spin 1s ease-in-out infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Notifications */
+    #notification-container { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
+    .notification { padding: 15px 20px; border-radius: 5px; color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); opacity: 0; transform: translateX(100%); transition: opacity 0.3s ease, transform 0.3s ease; }
+    .notification.show { opacity: 1; transform: translateX(0); }
+    .notification.success { background-color: var(--success-color); }
+    .notification.error { background-color: var(--error-color); }
+    .notification.info { background-color: var(--secondary-color); }
+    /* Admin Dashboard styles */
+    #adminDialog { max-width: 1200px; width: 90vw; }
+    #adminDialog h3 { margin-top: 0; color: var(--primary-color); }
+    #tickets-table, #users-table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: var(--surface-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    #tickets-table th, #tickets-table td, #users-table th, #users-table td { padding: 12px 15px; border: 1px solid var(--border-color); text-align: left; }
+    #tickets-table th, #users-table th { background-color: #f2f2f2; font-weight: 600; }
+    #tickets-table select { padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); }
+    #users-table .actions button { font-size: 0.8rem; padding: 5px 10px; margin-right: 5px; color: white; }
+    #users-table .actions .approve-btn { background-color: var(--success-color); }
+    #users-table .actions .reject-btn { background-color: var(--error-color); }
+
+    /* Side Panels for Desktop Design */
+    main { display: flex; justify-content: center; align-items: flex-start; gap: 2rem; }
+    .side-panel { width: 250px; display: flex; flex-direction: column; gap: 1.5rem; flex-shrink: 0; }
+    .feature-card { background: var(--surface-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; border: 1px solid var(--border-color); transition: transform 0.2s; }
+    .feature-card:hover { transform: translateY(-5px); }
+    .feature-icon { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; }
+    .feature-card h3 { margin: 0.5rem 0; color: var(--primary-color); font-size: 1.1rem; }
+    .feature-card p { margin: 0; font-size: 0.9rem; color: #666; line-height: 1.4; }
+    
+    @media (max-width: 1100px) {
+      .side-panel { display: none; }
+      .chat-container { margin: 0 auto; }
+    }
+    @media (max-width: 600px) {
+      .side-panel { flex-direction: column; }
+    }
+    /* Override chat container margin for flex layout */
+    .chat-container { margin: 0; flex-grow: 1; max-width: 600px; }
+  </style>
+  <script type="module" crossorigin src="/assets/main-CdkZFg9e.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/ui-BebV0JXd.js">
+</head>
+<body>
+
+  <header>
+    <h1 data-translate-key="mainTitle">ITC Helpdesk</h1>
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <select id="lang-switcher">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+      </select>
+      <span id="authStatus" data-translate-key="authStatusDefault">Not logged in</span>
+      <span class="auth-buttons">
+        <button id="adminDashboardButton" onclick="window.location.href='/admin.html'"><span data-translate-key="adminDashboard">Admin Dashboard</span></button>
+        <button id="showLoginButton"><span class="button-text" data-translate-key="login">Login</span></button>
+        <button id="showRegisterButton"><span class="button-text" data-translate-key="register">Register</span></button>
+        <button id="logoutButton" style="display: none;"><span class="button-text" data-translate-key="logout">Logout</span></button>
+      </span>
+    </div>
+  </header>
+
+  <main>
+    <div class="side-panel">
+      <div class="feature-card">
+        <span class="feature-icon">🕒</span>
+        <h3 data-translate-key="availabilityTitle">24/7 Availability</h3>
+        <p data-translate-key="availabilityText">Our automated support is always online to assist you anytime, day or night.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h3 data-translate-key="instantSupportTitle">Instant Support</h3>
+        <p data-translate-key="instantSupportText">Get immediate answers to your payroll and attendance queries.</p>
+      </div>
+    </div>
+
+    <div class="chat-container">
+      <div id="chat-window">
+        <ul id="message-list"></ul>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="message-input" placeholder="Type your message..." data-translate-key="messagePlaceholder">
+        <button id="mic-button" title="Speak">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.66 9 5v6c0 1.66 1.34 3 3 3z"/>
+            <path fill="currentColor" d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+          </svg>
+        </button>
+        <button id="send-button" data-translate-key="send">Send</button>
+      </div>
+    </div>
+
+    <div class="side-panel">
+      <div class="feature-card">
+        <span class="feature-icon">🛡️</span>
+        <h3 data-translate-key="trustableBrandTitle">Trustable Brand</h3>
+        <p data-translate-key="trustableBrandText">We are committed to providing reliable and accurate assistance.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <h3 data-translate-key="securePlatformTitle">Secure Platform</h3>
+        <p data-translate-key="securePlatformText">Your employee data is handled with enterprise-grade security.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Login/Register Dialog -->
+  <dialog id="loginDialog">
+    <form id="loginForm">
+      <h2 data-translate-key="login">Login</h2>
+      <input type="text" name="username" placeholder="Username" required data-translate-key="usernamePlaceholder">
+      <input type="password" name="password" placeholder="Password" required data-translate-key="passwordPlaceholder">
+      <button type="submit"><span class="button-text" data-translate-key="login">Login</span><span class="spinner"></span></button>
+      <p><span data-translate-key="noAccount">No account?</span> <a href="#" id="switchToRegister" data-translate-key="registerHere">Register here</a></p>
+    </form>
+    <form id="registerForm">
+      <h2 data-translate-key="register">Register</h2>
+      <input type="text" name="username" placeholder="Username" required minlength="3" data-translate-key="usernamePlaceholder">
+      <input type="password" name="password" placeholder="Password" required minlength="6" data-translate-key="passwordPlaceholder">
+      <input type="password" name="confirmPassword" placeholder="Confirm Password" required data-translate-key="confirmPasswordPlaceholder"> 
+      <select name="role" required data-translate-key="roleSelect" onchange="this.value === 'SSP' ? document.getElementById('regContractorInput').style.display = 'block' : document.getElementById('regContractorInput').style.display = 'none'">
+        <option value="Employee">Employee</option>
+        <option value="Worker">Worker</option>
+        <option value="Security">Security</option>
+        <option value="Contractor">Contractor</option>
+        <option value="SSP">SSP</option>
+        <option value="Admin">Admin</option>
+      </select>
+      <input type="text" name="contractor" id="regContractorInput" placeholder="Under which Contractor?" style="display:none;">
+      <button type="submit"><span class="button-text" data-translate-key="register">Register</span><span class="spinner"></span></button>
+      <p><span data-translate-key="haveAccount">Have an account?</span> <a href="#" id="switchToLogin" data-translate-key="loginHere">Login here</a></p>
+    </form>
+  </dialog>
+
+  <!-- Ticket Creation Dialog -->
+  <dialog id="ticketDialog">
+    <form id="ticketForm">
+      <h2 data-translate-key="createTicketTitle">Create a New Ticket</h2>
+      <input type="text" name="empId" placeholder="Employee ID" required data-translate-key="empIdPlaceholder">
+      <select name="category" required data-translate-key="categorySelect">
+        <option value="" data-translate-key="selectCategoryOption">--Select Category--</option>
+        <option value="Payslip">Payslip Issue</option>
+        <option value="Attendance">Attendance Issue</option>
+        <option value="Hardware">Hardware Problem</option>
+        <option value="Software">Software Problem</option>
+        <option value="Other">Other</option>
+      </select>
+      <textarea name="desc" placeholder="Describe the issue" required data-translate-key="describeIssuePlaceholder"></textarea>
+      <button type="submit"><span class="button-text" data-translate-key="submitTicket">Submit Ticket</span><span class="spinner"></span></button>
+    </form>
+  </dialog>
+
+  <!-- Notification container -->
+  <div id="notification-container"></div>
+
+  <footer style="text-align: center; padding: 2rem; color: #6c757d; font-size: 0.9rem;">
+    <p>&copy; 2024 ITC Helpdesk. All rights reserved. | <a href="/admin.html" data-translate-key="adminDashboard">Admin Dashboard</a></p>
+  </footer>
+
+</body>
+</html>
