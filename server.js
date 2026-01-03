@@ -294,7 +294,12 @@ app.get('/api/bot/intro', (req, res) => {
 app.get('*', (req, res) => {
   const indexPath = path.join(__dirname, 'public', 'index.html');
   if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error('SendFile error:', err);
+        if (!res.headersSent) res.status(500).send('Error loading frontend.');
+      }
+    });
   } else {
     res.status(404).send('Error: public/index.html not found. Please build the frontend and copy it to server/public.');
   }
@@ -303,4 +308,12 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`);
   console.log('Allowed Roles:', ALLOWED_ROLES);
+
+  // DEBUG: Check if public folder exists and log contents
+  const publicPath = path.join(__dirname, 'public');
+  if (fs.existsSync(publicPath)) {
+    console.log('Public folder found. Contents:', fs.readdirSync(publicPath));
+  } else {
+    console.log('WARNING: Public folder is MISSING at:', publicPath);
+  }
 });
