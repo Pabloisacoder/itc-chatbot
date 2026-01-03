@@ -306,6 +306,7 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
+  console.log('Server starting... (Version with safety checks)');
   console.log(`API running on http://localhost:${PORT}`);
   console.log('Allowed Roles:', ALLOWED_ROLES);
 
